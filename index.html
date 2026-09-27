@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!--
+  TETRIS — page structure.
+
+  There is no build step and no framework: this file is the entire UI. It is a
+  three-column layout (HOLD + stats | the board | NEXT + controls), and every
+  `<canvas>` here is painted imperatively from game.js. The HTML only provides
+  the containers and, importantly, the `id`s that game.js looks up.
+
+  This is the classic "structure vs. behaviour" split:
+    index.html  -> what exists        (this file)
+    style.css   -> how it looks       (presentation)
+    game.js     -> what it does       (logic + drawing)
+
+  The one rule to keep: if you rename an `id` here, rename the matching
+  document.getElementById(...) in game.js, or that feature silently stops
+  working.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tetris</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <h1 class="title">TETRIS</h1>
+
+    <div class="game-layout">
+
+      <!-- ============ LEFT PANEL: hold slot + the three counters ============ -->
+      <div class="side-panel">
+        <div class="panel-box">
+          <h2>HOLD</h2>
+          <!-- 96x96: three 18px preview cells plus padding. -->
+          <canvas id="hold-canvas" width="96" height="96"></canvas>
+        </div>
+        <div class="panel-box stats">
+          <h2>SCORE</h2>
+          <!-- The text inside each of these is a placeholder; game.js's
+               updateStats() overwrites it. The 0/1/0 values only stop the
+               panel looking empty on first paint. -->
+          <div id="score" class="stat-value">0</div>
+          <h2>LEVEL</h2>
+          <div id="level" class="stat-value">1</div>
+          <h2>LINES</h2>
+          <div id="lines" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- ==================== CENTRE: the playfield ==================== -->
+      <div class="board-container">
+        <!--
+          240x480 is not arbitrary: game.js declares COLS = 10 and ROWS = 20
+          and draws every cell as 24px, so 10 * 24 === 240 and 20 * 24 === 480.
+          If you change CELL in game.js you must change these numbers to match,
+          or the board will be cropped or leave a gap.
+        -->
+        <canvas id="board" width="240" height="480"></canvas>
+
+        <!--
+          A single overlay reused for both PAUSED and GAME OVER. It sits on top
+          of the board (see .overlay in the CSS) and is hidden by default via
+          the `hidden` class. game.js just swaps the two text nodes in and out
+          of the `hidden` class.
+        -->
+        <div id="overlay" class="overlay hidden">
+          <div id="overlay-message" class="overlay-message"></div>
+          <div id="overlay-sub" class="overlay-sub"></div>
+        </div>
+      </div>
+
+      <!-- ================= RIGHT PANEL: next queue + audio + help ============ -->
+      <div class="side-panel">
+        <div class="panel-box">
+          <h2>NEXT</h2>
+          <!-- Tall (232px) because it stacks three 18px previews 72px apart. -->
+          <canvas id="next-canvas" width="96" height="232"></canvas>
+        </div>
+        <div class="panel-box">
+          <h2>MUSIC</h2>
+          <!-- Also toggled with the M key; the label is kept in sync by
+               updateMusicButton() in game.js. -->
+          <button id="music-btn" type="button">MUSIC: OFF</button>
+        </div>
+        <!-- Cheat sheet. Keep in sync with the switch in game.js's keydown
+             handler if you rebind a key. -->
+        <div class="panel-box controls">
+          <h2>CONTROLS</h2>
+          <p>&larr; &rarr; Move</p>
+          <p>&darr; Soft drop</p>
+          <p>&uarr; / X Rotate CW</p>
+          <p>Z Rotate CCW</p>
+          <p>Space Hard drop</p>
+          <p>C Hold</p>
+          <p>P Pause</p>
+          <p>M Music</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- game.js is loaded last, at the end of <body>, so that every element it
+       looks up with getElementById already exists in the DOM. A script in
+       <head> would run too early and get null references. -->
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+/* =============================================================================
+ * TETRIS — stylesheet.
+
+ * The game itself is drawn on <canvas> elements, so this file is only
+ * responsible for the chrome around them: the three-column layout, the panel
+ * boxes, and the retro dark-neon look. No preprocessor, no reset library —
+ * just plain CSS customisable properties at the top.
+ *
+ * File map:
+ *   1. Design tokens (colours, spacing) — change the theme here
+ *   2. Reset & page shell
+ *   3. Layout: wrapper, title, three columns
+ *   4. Panels, stats, controls list
+ *   5. Music button + its states
+ *   6. The board and its overlay
+ * ========================================================================== */
+
+/* =============================================================================
+ * 1. DESIGN TOKENS
+ *
+ * Declaring the palette as custom properties means the theme can be changed in
+ * one place, and any colour can be reused as var(--accent) instead of being
+ * copy-pasted. `rgb(... / <alpha>)` is the modern way to add transparency to
+ * an existing colour.
+ * ========================================================================== */
+:root {
+  --bg-deep: #0b0b1e;        /* page background, outer edge */
+  --bg-top: #1a1a3e;         /* centre of the radial glow */
+  --text: #e0e0ff;           /* default body text */
+  --text-bright: #ffffff;    /* title, stat values */
+  --accent: #9aa0ff;         /* panel headings */
+  --accent-strong: #5c6cff;  /* buttons, glow */
+  --danger: #ff5566;         /* GAME OVER text */
+  --panel-bg: rgba(255, 255, 255, 0.04);
+  --panel-border: rgba(255, 255, 255, 0.12);
+}
+
+/* =============================================================================
+ * 2. RESET & PAGE SHELL
+ * ========================================================================== */
+
+/* The universal reset: kill the browser's default margins everywhere and make
+   `width` include padding, so panels size the way the layout maths assumes. */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  /* Two `background` declarations: the first is a flat fallback for browsers
+     without gradient support, the second wins wherever gradients work. */
+  background: var(--bg-deep);
+  background: radial-gradient(ellipse at top, var(--bg-top) 0%, var(--bg-deep) 70%);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* Flex centring is what puts the whole game in the middle of the window
+     without any positioning maths. */
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* The game is exactly viewport-sized, so scrolling would only be a way to
+     lose your place. */
+  overflow: hidden;
+}
+
+/* =============================================================================
+ * 3. LAYOUT
+ * ========================================================================== */
+
+/* Vertical stack: title on top, the three columns underneath. */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.title {
+  font-size: 28px;
+  /* The wide letter-spacing is most of what sells the arcade look. */
+  letter-spacing: 10px;
+  color: var(--text-bright);
+  /* Two stacked text-shadows make a soft neon halo. */
+  text-shadow: 0 0 12px var(--accent-strong), 0 0 30px #3944b8;
+}
+
+/* The three columns. `align-items: flex-start` keeps the shorter side panels
+   from stretching to the board's full height. */
+.game-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 120px;
+}
+
+/* =============================================================================
+ * 4. PANELS
+ * ========================================================================== */
+
+.panel-box {
+  /* Translucent fill + hairline border = "frosted" without a backdrop-filter. */
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.panel-box h2 {
+  /* Small, wide-tracked caps are the label style used throughout. */
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--text-bright);
+  /* Reserve a fixed height so the panel doesn't jump when a score grows
+     from 3 digits to 4 and wraps. */
+  min-height: 24px;
+  margin-bottom: 10px;
+}
+
+.controls p {
+  font-size: 11px;
+  margin: 3px 0;
+  text-align: left;
+}
+
+/* =============================================================================
+ * 5. MUSIC BUTTON
+ *
+ * `.on` is toggled from JavaScript (updateMusicButton), so the "currently
+ * playing" look is driven by state rather than a separate element.
+ * ========================================================================== */
+
+#music-btn {
+  background: rgba(92, 108, 255, 0.15);
+  border: 1px solid rgba(154, 160, 255, 0.5);
+  color: var(--text);
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s;
+}
+
+#music-btn:hover {
+  background: rgba(92, 108, 255, 0.35);
+}
+
+#music-btn.on {
+  background: var(--accent-strong);
+  color: var(--text-bright);
+  box-shadow: 0 0 10px rgba(92, 108, 255, 0.6);
+}
+
+/* =============================================================================
+ * 6. BOARD & OVERLAY
+ * ========================================================================== */
+
+/* `position: relative` is what allows the overlay to be positioned against
+   the board rather than the page. */
+.board-container {
+  position: relative;
+}
+
+#board {
+  background: #000;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  /* The glow around the playfield. */
+  box-shadow: 0 0 24px rgba(92, 108, 255, 0.25);
+}
+
+#hold-canvas,
+#next-canvas {
+  background: #000;
+  border-radius: 4px;
+}
+
+/* `inset: 0` is shorthand for top/right/bottom/left: 0 — it stretches the
+   overlay over the whole board container. */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Class-based hiding rather than `display: none` in JS, so the show/hide logic
+   all lives in the stylesheet and game.js only toggles one class name. */
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-message {
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--danger);
+  text-align: center;
+}
+
+.overlay-sub {
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
+}

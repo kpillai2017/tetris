@@ -1,0 +1,17 @@
+# Normalize line endings in the repository: LF in the index, LF on checkout.
+# Keeps diffs clean when the same repo is edited on Windows/macOS/Linux.
+* text=auto eol=lf
+
+# Treat the web assets as text (never try to diff them as binary).
+*.html text
+*.css  text
+*.js   text
+*.md   text
+*.json text
+
+# Never let git try to show a useful diff for these binary-ish files.
+*.png binary
+*.jpg binary
+*.ico binary
+*.mp3 binary
+*.wav binary

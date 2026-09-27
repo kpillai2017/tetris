@@ -1,0 +1,66 @@
+# ---- macOS ----
+# macOS litters directories with .DS_Store files; never commit them.
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ---- Windows ----
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---- Linux ----
+*~
+.directory
+
+# ---- Editors / IDEs ----
+# Editor state and machine-specific config
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+*.code-workspace
+
+# Editor swap/backup files
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# ---- Node / tooling ----
+# This project is dependency-free, but ignore tooling in case you add it.
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ---- Build output / logs ----
+dist/
+build/
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+
+# ---- Secrets & local env ----
+# The game has no backend, but never commit credentials if you add one.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# ---- OS / editor cruft that shows up in misc tools ----
+.cache/
+tmp/
+temp/
+*.log.old
